@@ -22,7 +22,7 @@ async def main():
     # Get the recipient from .env
     recipient_value = os.getenv("TELEGRAM_ID")
     recipient = await client.get_entity(recipient_value)
-    
+
     # Fetch scheduled messages once
     scheduled_msgs = await client.get_messages(recipient, scheduled=True)
 
@@ -33,10 +33,10 @@ async def main():
     # Schedule messages from the next hour to 11 PM
     for hour in range(next_hour.hour, 24):  # up to 11 PM
         scheduled_time = sgt.localize(datetime.combine(now.date(), time(hour, 0)))
-        scheduled_dt_utc = scheduled_dt.astimezone(pytz.utc)
+        scheduled_dt_utc = scheduled_time.astimezone(pytz.utc)
         already_scheduled = any(msg.date == scheduled_dt_utc for msg in scheduled_msgs)
         if already_scheduled:
-            print(f"[Skipped] Already scheduled at {scheduled_dt}")
+            print(f"[Skipped] Already scheduled at {scheduled_time}")
         else: 
             if scheduled_time < now:
                 scheduled_time += timedelta(days=1)
@@ -59,7 +59,7 @@ async def main():
 
     already_scheduled = any(msg.date == midnight_utc for msg in scheduled_msgs)
     if already_scheduled:
-        print(f"[Skipped] Midnight message already scheduled at {midnight_dt}")
+        print(f"[Skipped] Midnight message already scheduled at {midnight}")
     else:
         final_message = "Drink Up Baby!"
         print(f"Scheduling final message at: {midnight.strftime('%Y-%m-%d %H:%M:%S')} SGT")
