@@ -1,5 +1,5 @@
 from telethon.sync import TelegramClient
-from datetime import datetime, timedelta, date, time
+from datetime import datetime, timedelta, time
 from dotenv import load_dotenv
 import pytz
 import os
@@ -14,58 +14,50 @@ recipient_value = os.getenv("TELEGRAM_ID")
 # Define Singapore timezone
 sgt = pytz.timezone("Asia/Singapore")
 
-# Set date range (inclusive)
-start_date = date(2025, 6, 5)
-end_date = date(2025, 6, 6)
-
 # Initialize Telethon client
 client = TelegramClient("session", api_id, api_hash)
 
 async def main():
     await client.start(phone)
 
-    # Get recipient from .env
+    # Get recipient
     recipient = await client.get_entity(recipient_value)
 
-    # Fetch scheduled messages once
+    # Get all currently scheduled messages
     scheduled_msgs = await client.get_messages(recipient, scheduled=True)
+    scheduled_datetimes = {msg.date.astimezone(sgt).replace(minute=0, second=0, microsecond=0) for msg in scheduled_msgs}
 
-    current_date = start_date
-    while current_date <= end_date:
-        for hour in range(9, 24):  # 9 AM to 11 PM
-            scheduled_dt = sgt.localize(datetime.combine(current_date, time(hour, 0)))
-            scheduled_dt_utc = scheduled_dt.astimezone(pytz.utc)
-            # Avoid duplicate scheduled messages
-            already_scheduled = any(msg.date == scheduled_dt_utc for msg in scheduled_msgs)
-            if already_scheduled:
-                print(f"[Skipped] Already scheduled at {scheduled_dt}")
-            else:
-                if hour == 9:
-                    message = f"Drink up Baby! Please have your breakfast as well!"
-                elif hour == 12:
-                    message = f"Drink up Baby! Please have your lunch as well!"
-                elif hour == 16:
-                    message = f"Drink up Baby! Please have your snack as well!"
-                elif hour == 19:
-                    message = f"Drink up Baby! Please have your dinner as well!"
-                else:
-                    message = f"Drink Up Baby!"
-                print(f"Scheduling message at: {scheduled_dt.strftime('%Y-%m-%d %H:%M:%S')} SGT")
-                await client.send_message(recipient, message=message, schedule=scheduled_dt)
+    # Start scheduling from next full hour
+    now = datetime.now(sgt)
+    next_hour = (now + timedelta(hours=1)).replace(minute=0, second=0, microsecond=0)
 
-        # Schedule 12:00 AM for next day (midnight)
-        midnight_dt = sgt.localize(datetime.combine(current_date + timedelta(days=1), time(0, 0)))
-        midnight_utc = midnight_dt.astimezone(pytz.utc)
+    print("Current time SGT:", now.strftime("%Y-%m-%d %H:%M:%S"))
+    print(f"Already scheduled messages found: {len(scheduled_datetimes)}")
 
-        already_scheduled = any(msg.date == midnight_utc for msg in scheduled_msgs)
-        if already_scheduled:
-            print(f"[Skipped] Midnight message already scheduled at {midnight_dt}")
+    messages_scheduled = len(scheduled_datetimes)
+    scheduled_time = next_hour
+
+    while messages_scheduled < 100:
+        if scheduled_time in scheduled_datetimes:
+            print(f"[Skipped] Already scheduled at {scheduled_time.strftime('%Y-%m-%d %H:%M:%S')} SGT")
         else:
-            midnight_msg = f"Drink Up Baby!"
-            print(f"Scheduling midnight message at: {midnight_dt}")
-            await client.send_message(recipient, message=midnight_msg, schedule=midnight_dt)
+            hour = scheduled_time.hour
+            if hour == 9:
+                message = "Drink up Baby! Please have your breakfast as well!"
+            elif hour == 12:
+                message = "Drink up Baby! Please have your lunch as well!"
+            elif hour == 16:
+                message = "Drink up Baby! Please have your snack as well!"
+            elif hour == 19:
+                message = "Drink up Baby! Please have your dinner as well!"
+            else:
+                message = "Drink Up Baby!"
 
-        current_date += timedelta(days=1)
+            print(f"Scheduling message at: {scheduled_time.strftime('%Y-%m-%d %H:%M:%S')} SGT")
+            await client.send_message(recipient, message=message, schedule=scheduled_time)
+            messages_scheduled += 1
+
+        scheduled_time += timedelta(hours=1)
 
 with client:
     client.loop.run_until_complete(main())
