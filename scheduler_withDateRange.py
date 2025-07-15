@@ -54,7 +54,7 @@ async def main():
         else:
             # Time-based message logic
             if hour == 9:
-                message = "Drink up Baby! Please have your breakfast as well!"
+                message = "Drink up Baby! Please have your breakfast and take your daily supplements (Tribiotix, Yeast B Complex and Vitamin D3) as well!"
             elif hour == 12:
                 message = "Drink up Baby! Please have your lunch as well!"
             elif hour == 16:
