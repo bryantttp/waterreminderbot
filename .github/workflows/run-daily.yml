@@ -1,5 +1,9 @@
 name: Run Scheduler Daily
-
+env:
+  API_ID: ${{ secrets.API_ID }}
+  API_HASH: ${{ secrets.API_HASH }}
+  PHONE_NUMBER: ${{ secrets.PHONE_NUMBER }}
+  TELEGRAM_ID: ${{ secrets.TELEGRAM_ID }}
 on:
   schedule:
     - cron: '0 6 * * *'  # Runs daily at 6:00 UTC
