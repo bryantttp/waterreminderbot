@@ -10,7 +10,10 @@ api_id = int(os.getenv("API_ID"))
 api_hash = os.getenv("API_HASH")
 bot_token = os.getenv("BOT_TOKEN")
 recipient_value = os.getenv("TELEGRAM_ID")
-
+print(f"API_ID: {api_id}")
+print(f"API_HASH: {api_hash}")
+print(f"BOT_TOKEN: {bot_token}")
+print(f"TELEGRAM_ID: {recipient_value}")
 # Singapore timezone
 sgt = pytz.timezone("Asia/Singapore")
 
