@@ -5,6 +5,7 @@ env:
   PHONE_NUMBER: ${{ secrets.PHONE_NUMBER }}
   BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
   TELEGRAM_ID: ${{ secrets.TELEGRAM_ID }}
+  SESSION_PASSWORD: ${{ secrets.SESSION_PASSWORD }}
 on:
   schedule:
     - cron: '0 6 * * *'  # Runs daily at 6:00 UTC
@@ -26,6 +27,10 @@ jobs:
     - name: Install dependencies
       run: |
         pip install -r requirements.txt
+
+    - name: Decrypt Telegram session file
+      run: |
+        openssl enc -aes-256-cbc -pbkdf2 -iter 100000 -d -in session.enc -out session.session -k "${{ secrets.SESSION_PASSWORD }}"
 
     - name: Run Python script
       run: |
