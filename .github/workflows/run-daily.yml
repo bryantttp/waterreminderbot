@@ -4,6 +4,7 @@ env:
   API_HASH: ${{ secrets.API_HASH }}
   PHONE_NUMBER: ${{ secrets.PHONE_NUMBER }}
   BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+  TELEGRAM_ID: ${{ secrets.TELEGRAM_ID }}
 on:
   schedule:
     - cron: '0 6 * * *'  # Runs daily at 6:00 UTC
