@@ -34,4 +34,4 @@ jobs:
 
     - name: Run Python script
       run: |
-        python scheduler_withDateRange_github.py
+        python scheduler_withDateRange.py
