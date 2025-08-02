@@ -43,8 +43,8 @@ async def main():
     while messages_scheduled < 100:
         hour = scheduled_time.hour
 
-        # Skip hours from 3AM to 8AM
-        if 3 <= hour <= 8:
+        # Skip hours from 2AM to 8AM
+        if 2 <= hour <= 8:
             scheduled_time += timedelta(hours=1)
             continue
 
