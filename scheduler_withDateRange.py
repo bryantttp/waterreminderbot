@@ -23,12 +23,16 @@ async def main():
     # Get recipient
     recipient = await client.get_entity(recipient_value)
 
-    # Get all currently scheduled messages
-    scheduled_msgs = await client.get_messages(recipient, scheduled=True)
-    scheduled_datetimes = {
-        msg.date.astimezone(sgt).replace(minute=0, second=0, microsecond=0)
-        for msg in scheduled_msgs
-    }
+    # Fetch all scheduled messages robustly using pagination
+scheduled_msgs = []
+async for msg in client.iter_messages(recipient, scheduled=True):
+    scheduled_msgs.append(msg)
+
+# Normalize to the hour and local timezone
+scheduled_datetimes = {
+    msg.date.astimezone(sgt).replace(minute=0, second=0, microsecond=0)
+    for msg in scheduled_msgs
+}
 
     # Start from the next full hour
     now = datetime.now(sgt)
