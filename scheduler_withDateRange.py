@@ -1,6 +1,7 @@
 from telethon.sync import TelegramClient
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
+from telethon.tl.functions.messages import GetScheduledHistoryRequest
 import pytz
 import os
 
@@ -38,10 +39,13 @@ async def main():
     recipient = await client.get_entity(recipient_value)
 
     # Get all currently scheduled messages from Telegram (best-effort)
-    scheduled_msgs = []
-    async for msg in client.iter_messages(recipient, limit=200):
-        if msg.from_scheduled and msg.date > datetime.now(tz=sgt):
-            scheduled_msgs.append(msg)
+    scheduled_result = await client(GetScheduledHistoryRequest(peer=recipient))
+    scheduled_msgs = scheduled_result.messages  # List[Message]
+    
+    scheduled_datetimes_telegram = {
+        msg.date.astimezone(sgt).replace(minute=0, second=0, microsecond=0)
+        for msg in scheduled_msgs
+    }
             
     # Normalize Telegram-scheduled datetimes
     scheduled_datetimes_telegram = {
