@@ -40,7 +40,7 @@ async def main():
     # Get all currently scheduled messages from Telegram (best-effort)
     scheduled_msgs = []
     async for msg in client.iter_messages(recipient, limit=200):
-        if msg.is_scheduled and msg.date > datetime.now(tz=sgt):
+        if msg.from_scheduled and msg.date > datetime.now(tz=sgt):
             scheduled_msgs.append(msg)
             
     # Normalize Telegram-scheduled datetimes
