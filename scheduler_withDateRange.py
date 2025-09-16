@@ -39,8 +39,8 @@ async def main():
     recipient = await client.get_entity(recipient_value)
 
     # Get all currently scheduled messages from Telegram (best-effort)
-    scheduled_result = await client(GetScheduledHistoryRequest(peer=recipient))
-    scheduled_msgs = scheduled_result.messages  # List[Message]
+    scheduled_result = await client(GetScheduledHistoryRequest(peer=recipient, hash=0))
+    scheduled_msgs = scheduled_result.messagesList[Message]
     
     scheduled_datetimes_telegram = {
         msg.date.astimezone(sgt).replace(minute=0, second=0, microsecond=0)
